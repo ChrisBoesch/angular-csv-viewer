@@ -13,6 +13,7 @@ app.get('/', function(req, res) {
 
 app.get('/videos', function(req, res) {
   setTimeout((function() {
+    //This is where the API will need to be mocked. 
     res.send(
       [
         {
