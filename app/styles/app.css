@@ -1,0 +1,44 @@
+body {
+    padding-top: 70px;
+}
+/* Style Nav bar*/
+.edu-navbar {}
+/* End Style Nav bar*/
+.edu-sidebar {
+    margin-top: 20px;
+}
+.edu-top-header {
+    margin-top: 0;
+}
+.edu-sidebar .glyphicon {
+    margin-right: 10px;
+}
+.spinnerContainer {
+    padding: 20px 0;
+}
+
+/* Generic */
+.right-inner-addon {
+    position: relative;
+}
+.right-inner-addon input {
+    padding-right: 30px;
+}
+.right-inner-addon i {
+    position: absolute;
+    right: 10px;
+    padding: 0;
+    pointer-events: none;
+    font-size: 14px;
+    line-height: 45px;
+}
+
+/* ngAnimation */
+.animate-enter {
+    -webkit-transition: 1s linear all; /* Chrome */
+    transition: 1s linear all;
+    opacity: 0;
+}
+.animate-enter.animate-enter-active {
+    opacity: 1;
+}
