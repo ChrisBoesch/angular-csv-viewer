@@ -1,6 +1,6 @@
-# Angular Education GUI
+# Angular CSV Viewer App
 
-An AngularJS-based user interface for an eduction webstie to serve videos and ask questions about the video content
+An AngularJS-based user interface for an CSV viewer app
 
 ## Installation
 
