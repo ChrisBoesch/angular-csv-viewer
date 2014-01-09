@@ -1,6 +1,19 @@
 angular.module('app.homePages', ['app.config', 'app.services', 'ngResource', 'ngAnimate', 'angularSpinkit']).
 
-  controller('HomeCtrl', function() {}).
+  controller('HomeCtrl', function($scope, files) {
+    $scope.files = [];
+    $scope.loading = true;
+    
+    $scope.urlFor = function(file) {
+      return '/#/file/' + encodeURIComponent(file.key);
+    };
+    
+    files.all().then(function(data) {
+      console.dir(data);
+      $scope.loading = false;
+      $scope.files = data;
+    });
+  }).
 
   controller('MenuCtrl', function($scope, $route) {
     $scope.isActive = function(ctrlName) {

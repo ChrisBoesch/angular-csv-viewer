@@ -6,6 +6,22 @@ describe('Home Pages', function() {
 
   beforeEach(module('app.homePages'));
 
+  describe('Home Menu', function(){
+    beforeEach(inject(function($controller, $rootScope) {
+      scope = $rootScope.$new();
+      ctrl = $controller('HomeCtrl', {
+        $scope: scope,
+      });
+    }));
+
+    describe('Initialization', function(){
+      it('should set the list of the current user list of file', function() {
+        expect(scope.files).toEqual([]);
+      });
+    });
+
+  });
+
   describe('Menu Controller', function() {
 
     beforeEach(inject(function($controller, $rootScope) {

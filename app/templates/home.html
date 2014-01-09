@@ -4,5 +4,32 @@
     </h1>
 </div>
 
-<p>TODO: show last 50 files uploaded by the current user</p>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Last change</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-show="files.length == 0">
+			<td colspan="3">
+				<wave-spinner ng-show="loading"></wave-spinner>
+				<span ng-show="!loading">
+					No file uploaded
+				</span>
+			</td>
+		</tr>
+		<tr ng-repeat="file in files">
+			<td>{{file.name}}</td>
+			<td>{{file.lastUpdate|date: 'medium'}}</td>
+			<td>
+				<a ng-href="{{urlFor(file)}}">
+					edit
+				</a>
+			</td>
+		</tr>
+	</tbody>
+</table>
 

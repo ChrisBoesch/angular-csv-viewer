@@ -1,5 +1,6 @@
 var express = require('express'),
-  app = express();
+  app = express(),
+  _ = require('lodash');
 
 // Simulate slow network with a delay
 var DELAY = process.env.DELAY || 0;
@@ -16,25 +17,33 @@ app.get('/', function(req, res) {
   res.send('welcome to fake api provider');
 });
 
-app.get('/videos', function(req, res) {
+/**
+ * Send  50 most file descriptions of the current logged in user, sorted by
+ * last modification date.
+ *
+ * Sends a json object. The `files` attribute should be an array. Each element
+ * should have `name`, `lastMofified`, `key` attributes.
+ *  
+ * should return an empty list and an http error code.
+ *
+ * Error:
+ *   - 401, if the user is not logged in (not implemented in mockup).
+ * 
+ */
+app.get('/file', function(req, res) {
   setTimeout(function() {
-    //This is where the API will need to be mocked. 
-    res.send(
-      [
-        {
-          title: 'Introduction to JavaScript',
-          description: 'Basics of the awesome JavaScript programming language',
-          thumbnail: 'http://placehold.it/320x180',
-          url: 'http://'
-        },
-        {
-          title: 'Egghead.io - Bower - Intro to Bower',
-          description: 'More great videos at http://egghead.io',
-          thumbnail: 'http://i1.ytimg.com/vi/vO_Ie3kMXbY/mqdefault.jpg',
-          url: 'http://www.youtube.com/watch?v=vO_Ie3kMXbY'
-        }
-      ]
-    );
+    var files = _.values(FILE_DB);
+    
+    files = _.sortBy(files, function(f) {
+      return -f.lastModification;
+    });
+
+    if (files.length > 50) {
+      files = files.slice(0, 50);
+    }
+
+    res.send(files);
+
   }, DELAY);
 });
 
@@ -57,9 +66,13 @@ app.post('/file', function(req, res) {
     name = req.files.newFile.name;
   }
 
-  FILE_DB[name] = req.files.newFile.path;
+  FILE_DB[name] = {
+    '_path': req.files.newFile.path,
+    'name': name,
+    'key': name,
+    'lastUpdate': new Date().getTime(),
+  };
   res.redirect('/#/file/' + encodeURIComponent(name));
-  console.dir(FILE_DB);
 });
 
 app.listen(9090);

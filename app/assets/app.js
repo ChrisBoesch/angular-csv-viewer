@@ -34830,20 +34830,34 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
   .constant('TPL_PATH', '/templates')
   .constant('API_BASE', '/api/v1');
 ;angular.module('app.directives', ['app.config']);
-;angular.module('app.services', ['app.config'])
-  
-  .factory('videos', function(API_BASE, $resource) {
-    var res = $resource(API_BASE + '/videos');
+;angular.module('app.services', ['app.config']).
+
+  factory('files', function(API_BASE, $resource){
+    var res = $resource(API_BASE + '/file/:key');
+    console.dir(res);
     return {
       all: function() {
         return res.query().$promise;
-      }
+      },
     };
   })
 
 ;;angular.module('app.homePages', ['app.config', 'app.services', 'ngResource', 'ngAnimate', 'angularSpinkit']).
 
-  controller('HomeCtrl', function() {}).
+  controller('HomeCtrl', function($scope, files) {
+    $scope.files = [];
+    $scope.loading = true;
+    
+    $scope.urlFor = function(file) {
+      return '/#/file/' + encodeURIComponent(file.key);
+    };
+    
+    files.all().then(function(data) {
+      console.dir(data);
+      $scope.loading = false;
+      $scope.files = data;
+    });
+  }).
 
   controller('MenuCtrl', function($scope, $route) {
     $scope.isActive = function(ctrlName) {
