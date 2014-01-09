@@ -7,6 +7,7 @@ An AngularJS-based user interface for an CSV viewer app
 1. `npm install -g grunt-cli`
 2. `npm install`
 3. `grunt install`
+4. `./node_modules/.bin/webdriver-manager update`
 
 ## Development
 
@@ -21,7 +22,10 @@ An AngularJS-based user interface for an CSV viewer app
 ### Unit Testing
 
 #### Single run tests
-`grunt test:unit` 
+`grunt test:unit`
+
+Note: if phantomjs fails to load, try downloading it from `phantomjs.com` to replace 
+`./node_modules/karma-phantomjs-launcher/node_modules/phantomjs/bin/phantomjs`
 
 #### Auto watching tests
 `grunt autotest:unit`
