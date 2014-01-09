@@ -7,6 +7,11 @@ var DELAY = process.env.DELAY || 0;
 // One second delay
 DELAY = 1000;
 
+//
+var FILE_DB = {};
+
+app.use(express.bodyParser());
+
 app.get('/', function(req, res) {
   res.send('welcome to fake api provider');
 });
@@ -31,6 +36,30 @@ app.get('/videos', function(req, res) {
       ]
     );
   }, DELAY);
+});
+
+app.post('/file', function(req, res) {
+  var name;
+
+  if (!req.files || !req.files.newFile) {
+    // TODO
+    return res.redirect('back');
+  }
+
+  if (req.files.newFile.type !== "text/csv") {
+    // TODO
+    return res.redirect('back');
+  }
+
+  if (req.body && req.body.fileName) {
+    name = req.body.fileName;
+  } else {
+    name = req.files.newFile.name;
+  }
+
+  FILE_DB[name] = req.files.newFile.path;
+  res.redirect('/#/file/' + encodeURIComponent(name));
+  console.dir(FILE_DB);
 });
 
 app.listen(9090);

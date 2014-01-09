@@ -34830,8 +34830,8 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
   .constant('TPL_PATH', '/templates')
   .constant('API_BASE', '/api/v1');
 ;angular.module('app.directives', ['app.config']);
-;angular.module('app.homePages', ['app.config', 'ngResource', 'ngAnimate', 'angularSpinkit'])
-
+;angular.module('app.services', ['app.config'])
+  
   .factory('videos', function(API_BASE, $resource) {
     var res = $resource(API_BASE + '/videos');
     return {
@@ -34841,18 +34841,57 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
     };
   })
 
-  .controller('HomeCtrl', function($scope, videos) {
-    $scope.videos = null;
-    videos.all().then(function(data) {
-      $scope.videos = data;
-    });
+;;angular.module('app.homePages', ['app.config', 'app.services', 'ngResource', 'ngAnimate', 'angularSpinkit']).
 
+  controller('HomeCtrl', function() {}).
+
+  controller('MenuCtrl', function($scope, $route) {
+    $scope.isActive = function(ctrlName) {
+      if (!$route.current ||
+        !$route.current.$$route ||
+        !$route.current.$$route.controller
+      ) {
+        return false;
+      }
+      return $route.current.$$route.controller === ctrlName;
+    };
+  }).
+
+  controller('LogonCtrl', function($scope){
+    // TODO: fetch the user logoff URL.
+    
+    $scope.logoffUrl = function () {
+      return '#';
+    };
   });
-;angular.module('myApp', ['app.config', 'ngRoute', 'app.homePages'])
+;angular.module('app.filePages', ['app.config', 'app.services', 'ngResource', 'ngAnimate', 'angularSpinkit']).
+
+  controller('UploadCtrl', function($scope, API_BASE) {
+    // TODO: validate form and send it with ajax.
+    $scope.action = API_BASE + '/file';
+  }).
+
+  controller('EditCtrl', function($scope, $routeParams) {
+    // TODO: fetch file content.
+    console.log($routeParams);
+    $scope.name = decodeURIComponent($routeParams.fileName) || 'unknown';
+  });
+;angular.module('myApp', ['app.config', 'ngRoute', 'app.homePages', 'app.filePages'])
 
   .config(function($routeProvider, TPL_PATH) {
-    $routeProvider.when('/', {
-      controller: 'HomeCtrl',
-      templateUrl: TPL_PATH + '/home.html'
-    });
+    $routeProvider.
+      when('/', {
+        controller: 'HomeCtrl',
+        templateUrl: TPL_PATH + '/home.html'
+      }).
+
+      when('/upload', {
+        controller: 'UploadCtrl',
+        templateUrl: TPL_PATH + '/upload.html'
+      }).
+
+      when('/file/:fileName', {
+        controller: 'EditCtrl',
+        templateUrl: TPL_PATH + '/edit.html'
+      });;
   });

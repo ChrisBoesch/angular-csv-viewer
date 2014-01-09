@@ -1,0 +1,17 @@
+<div class="page-header edu-top-header">
+    <h1>Upload <small>Upload and encrypt cvs file</small></h1>
+</div>
+
+<form action="{{action}}" method="post" enctype="multipart/form-data">
+	<div class="form-group">
+		<label for="fileName">File Name</label>
+		<input type="text" name="fileName" class="form-control" id="fileName">
+	</div>
+	<div class="form-group">
+	    <label for="newFile">CSV file to upload</label>
+	    <input type="file" name="newFile" id="newFile">
+	    <p class="help-block">Fields should be separated by commas.</p>
+	</div>
+	<button type="submit" class="btn btn-default">Upload</button>
+</form>
+

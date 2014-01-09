@@ -143,7 +143,9 @@ module.exports = function(grunt) {
           'bower_components/angular-spinkit/build/angular-spinkit.js',
           'app/scripts/config.js',
           'app/scripts/directives.js',
+          'app/scripts/services.js',
           'app/scripts/homePages.js',
+          'app/scripts/filePages.js',
           'app/scripts/app.js'
           //place your JavaScript files here
         ]

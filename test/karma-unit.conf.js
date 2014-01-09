@@ -11,7 +11,9 @@ module.exports = function(config) {
       'bower_components/angular-spinkit/build/angular-spinkit.js',
       'app/scripts/config.js',
       'app/scripts/directives.js',
+      'app/scripts/services.js',
       'app/scripts/homePages.js',
+      'app/scripts/filePages.js',
       'app/scripts/app.js',
       'test/unit/**/*.js',
       'app/templates/**/*.html'

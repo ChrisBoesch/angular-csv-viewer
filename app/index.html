@@ -31,6 +31,10 @@
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+            <ul class="nav navbar-nav navbar-right" ng-controller="LogonCtrl">
+                <!-- TODO: Add log off url -->
+                <li><a ng-href="{{logoffUrl()}}">Log off</a></li>
+            </ul>
         </div>
         <!--/.nav-collapse -->
     </div>
@@ -40,23 +44,15 @@
     <div class="row">
         <div class="col-md-3">
             <div class="edu-sidebar">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="active">
-                        <a href="#">
-                            <span class="badge pull-right">42</span>
-                            <span class="glyphicon glyphicon-film"></span> Videos
+                <ul class="nav nav-pills nav-stacked" ng-controller="MenuCtrl">
+                    <li ng-class="{active: isActive('HomeCtrl')}">
+                        <a href="#/">
+                            <span class="glyphicon glyphicon-cloud"></span>Your Files
                         </a>
                     </li>
-                    <li>
-                        <a href="#">
-                            <span class="badge pull-right">30</span>
-                            <span class="glyphicon glyphicon-play"></span>Unsolved
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <span class="badge pull-right">14</span>
-                            <span class="glyphicon glyphicon-ok"></span>Solved
+                    <li ng-class="{active: isActive('UploadCtrl')}">
+                        <a href="#/upload">
+                            <span class="glyphicon glyphicon-cloud-upload"></span>Upload
                         </a>
                     </li>
                 </ul>

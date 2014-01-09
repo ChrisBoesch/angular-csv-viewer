@@ -2,23 +2,35 @@
 
 describe('Home Pages', function() {
 
-  var ctrl, scope;
+  var ctrl, scope, route;
 
   beforeEach(module('app.homePages'));
 
-  beforeEach(inject(function($controller, $rootScope) {
-    scope = $rootScope.$new();
-    ctrl = $controller('HomeCtrl', {
-      $scope: scope
-    });
-  }));
+  describe('Menu Controller', function() {
 
-  describe('Home Controller', function() {
+    beforeEach(inject(function($controller, $rootScope) {
+      scope = $rootScope.$new();
+      route = {};
+      ctrl = $controller('MenuCtrl', {
+        $scope: scope,
+        $route: route,
+      });
+    }));
 
-    describe('Initialization', function() {
+    describe('isActive method', function() {
 
-      it('should instantiate videos to null', function() {
-        expect(scope.videos).toBeNull();
+      it('Should return false when route is not set', function() {
+        expect(scope.isActive('foo')).toBe(false);
+      });
+
+      it('Should return false when the current conroller name does not match', function() {
+        route.current = {'$$route': {'controller': 'bar'}};
+        expect(scope.isActive('foo')).toBe(false);
+      });
+
+      it('Should return false when the current conroller name does match', function() {
+        route.current = {'$$route': {'controller': 'foo'}};
+        expect(scope.isActive('foo')).toBe(true);
       });
 
     });
