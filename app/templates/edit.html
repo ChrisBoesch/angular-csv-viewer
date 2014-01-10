@@ -4,10 +4,32 @@
     </h1>
 </div>
 
+<table class="table">
+	<thead>
+		<tr>
+			<td ng-repeat="i in range()">
+				Column {{i+1}}
+			</td>
+		</tr>	
+	</thead>
+	<tbody>
+		<tr ng-show="loading">
+			<td><wave-spinner></wave-spinner></td>
+		</tr>
+		<tr ng-show="!loading && data.length == 0">
+			<td>No data</td>
+		</tr>
+		<tr ng-repeat="row in data">
+			<td ng-repeat="i in range()">
+				{{getValue(row, i)}}
+			</td>
+		</tr>
+	</tbody>
+</table>
+
 <p>TODO:</p>
 <ul>
-	<li>show CVS content;</li>
-	<li>allow to set columns to encrypt</li>
+	<li>allow to set columns to encrypt;</li>
 	<li>allow content editing?</li>
 	<li>allow to set columns header?</li>
 </ul>

@@ -75,6 +75,23 @@ app.post('/file', function(req, res) {
   res.redirect('/#/file/' + encodeURIComponent(name));
 });
 
+app.get('/file/:fileName.csv', function(req, res) {
+  if (!req.params.fileName) {
+    return res.send(404, 'Sorry, we cannot find that!');
+  }
+
+  var fileName = decodeURIComponent(req.params.fileName);
+  if (!FILE_DB[fileName] || !FILE_DB[fileName]._path) {
+    return res.send(404, 'Sorry, we cannot find that!');
+  }
+  setTimeout(function() {
+    res.download(
+      FILE_DB[fileName]._path,
+      encodeURIComponent(fileName) + '.csv'
+    );
+  }, DELAY);
+});
+
 app.listen(9090);
 
 console.log('Listening on port 9090');
