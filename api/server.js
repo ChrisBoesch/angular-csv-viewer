@@ -1,7 +1,8 @@
 var express = require('express'),
   app = express(),
   _ = require('lodash'),
-  csv = require('csv');
+  csv = require('csv'),
+  temp = require('temp');
 
 
 // Simulate slow network with a delay
@@ -10,8 +11,37 @@ var DELAY = process.env.DELAY || 0;
 // One second delay
 DELAY = 1000;
 
+
 //
-var FILE_DB = [];
+var FILE_DB = [],
+  encrypt,
+  randomEncryptedData = [
+    'A5IwaerPVzcIWOtCt3VBlkdIquXO8tnPuX1XtwuHGXyuAvA60K7VGgcvjunq2CbOz7bA78SDXokl\nYhLHWhCzua0aTWNCGGcmji6JRwTxbJVNtcDTqTv5C9iG2k7dkR0aa44URqZlYK/top/tHFvxI3on\nvCSin6hj8kAASfmgNyQ=\n',
+    'Svkm2UYbYgHJbXgcU+HH90/zspliLtvZ8d5Zc+k0rg8nL4nUanMME13qGx504WAPu5R2vFfuQf6t\nyesGeNfdLGziGg5vd+spwqi2qAS4cTTzqo6MBWKRh7h9qFEIKgbh+mJXLhntIyZqCLAcyrw3FN8U\nKJ4Ka635tvf0kDmCeWI=\n',
+    'uvdOxTJZNexaOcrOqQC/MZ15pAWA91HSrT5HIOcHiwENGM+6h1ZwtN8pNe6Xgrx4ILi8/c6Cb5fx\n1TJfNk5534VEl4e0Njv4HS+DhmFzJGxe/mlX//HxMDDVqlMJlXZpDUCWa1aTqfVyCywBhVVmWEDA\nicPs8X8w79cGorbvTgw=\n'
+  ];
+
+encrypt = function(path, indexes, includesHeaders) {
+  var out = temp.path({suffix: '.csv'});
+
+  csv().
+    from.path(path).
+    to.path(out).
+    transform(function(row, index){
+      if (includesHeaders && index === 0) {
+        return row;
+      }
+
+      for (var i = 0; i < row.length; i++) {
+        if (indexes.indexOf(i) !== -1) {
+          row[i] = _.sample(randomEncryptedData);
+        }
+      }
+      return row;
+    });
+
+  return out;
+};
 
 app.use(express.bodyParser());
 
@@ -177,17 +207,35 @@ app.get('/file/:key(\\d+)', function(req, res) {
 });
 
 /**
- * Update the file metadata and encrypt columns if necessary
+ * Update the file metadata and encrypt columns if necessary.
  * 
  */
 app.post('/file/:key(\\d+)', function(req, res) {
-  var key = decodeURIComponent(req.params.key);
+  var key = decodeURIComponent(req.params.key),
+    newColumns = [];
+
   if (!FILE_DB[key]) {
     return res.send(404, 'Sorry, we cannot find that!');
   }
 
-  // todo encrypt
+  // Check is any column needs to be encrypted
+  for (var i = 0; i < FILE_DB[key].columns.length; i++) {
+    if (FILE_DB[key].columns[i].encrypt !== req.body.columns[i].encrypt) {
+      newColumns.push(i);
+    }
+  }
+
+  // update metadata
   _.extend(FILE_DB[key], req.body);
+
+  // replace path
+  // NOTE: It's just a mock, it won't delete the plain data.
+  FILE_DB[key]._path = encrypt(
+    FILE_DB[key]._path,
+    newColumns,
+    FILE_DB[key].hasHeaderRow
+  );
+
   setTimeout(function() {
     res.send(FILE_DB[key]);
   }, DELAY);
