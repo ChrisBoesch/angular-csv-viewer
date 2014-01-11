@@ -30,29 +30,35 @@ describe('File Pages', function() {
   });
 
   describe('Edit Controller', function() {
-    var download, downloadArgs, files;
+    var download, downloadArgs, infoArgs, info, files;
 
     beforeEach(inject(function($rootScope, $q) {
       scope = $rootScope.$new();
       download = $q.defer();
+      info = $q.defer();
       files = {
         download: function() {
           downloadArgs = arguments;
           return download.promise;
+        },
+        info: function() {
+          infoArgs = arguments;
+          return info.promise;
         }
+
       };
     }));
 
     describe('Initialization', function() {
 
-      it('Should set file name', inject(function($controller) {
+      it('Should set an empty file name', inject(function($controller) {
         ctrl = $controller('EditCtrl', {
           '$scope': scope,
-          '$routeParams': {'fileName': 'foo'},
+          '$routeParams': {'key': '0'},
           'files': files
         });
 
-        expect(scope.name).toBe('foo');
+        expect(scope.metadata.name).toBe('');
       }));
 
       it('Should set empty data content', inject(function($controller) {
@@ -86,12 +92,24 @@ describe('File Pages', function() {
           'files': files
         });
 
+        info.resolve({
+          name: 'foo',
+          key: 1234,
+          lastMofified: 1234567890,
+          hasHeaderRow: false,
+          delimiter: ',',
+          columns: [
+            {encrypt: false, name: undefined},
+            {encrypt: false, name: undefined},
+            {encrypt: false, name: undefined}
+          ]
+        });
         download.resolve({'data': 'bob,foo,bar\nalice,baz,fooz'});
         scope.$apply();
 
         expect(scope.data).toEqual([['bob', 'foo', 'bar'], ['alice', 'baz', 'fooz']]);
         expect(scope.loading).toBe(false);
-        expect(scope.colCount).toEqual(3);
+        expect(scope.metadata.columns.length).toEqual(3);
       }));
     });
 
