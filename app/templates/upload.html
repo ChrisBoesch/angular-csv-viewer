@@ -4,8 +4,8 @@
 
 <form action="{{action}}" method="post" enctype="multipart/form-data">
 	<div class="form-group">
-		<label for="fileName">File Name</label>
-		<input type="text" name="fileName" class="form-control" id="fileName">
+		<label for="name">File Name</label>
+		<input type="text" name="name" class="form-control" id="name">
 	</div>
 	<div class="form-group">
 	    <label for="newFile">CSV file to upload</label>
@@ -15,3 +15,7 @@
 	<button type="submit" class="btn btn-default">Upload</button>
 </form>
 
+<p>
+	TODO: add options to set delimiter and flag indicating if headers are
+	presents in first row. Use ',' and true respectively by default.
+</p>

@@ -10,6 +10,12 @@ angular.module('app.services', ['app.config']).
         return $http.get(
           API_BASE + '/file/' + encodeURIComponent(key) + '.csv'
         );
+      },
+      info: function(key) {
+        return res.get({key: key}).$promise;
+      },
+      updateInfo: function(info) {
+        return res.save({key: info.key}, info).$promise;
       }
     };
   })

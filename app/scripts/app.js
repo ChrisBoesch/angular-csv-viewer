@@ -12,8 +12,8 @@ angular.module('myApp', ['app.config', 'ngRoute', 'app.homePages', 'app.filePage
         templateUrl: TPL_PATH + '/upload.html'
       }).
 
-      when('/file/:fileName', {
+      when('/file/:key', {
         controller: 'EditCtrl',
         templateUrl: TPL_PATH + '/edit.html'
-      });;
+      });
   });

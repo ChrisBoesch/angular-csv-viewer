@@ -1,15 +1,20 @@
 <div class="page-header edu-top-header">
     <h1>
-    	Edit file named "{{name}}"
+    	Edit file 
+    	<span ng-hide="loading">named "{{metadata.name}}"</span>
     </h1>
 </div>
 
-<table class="table">
+<table class="table table-file-data">
 	<thead>
 		<tr>
-			<td ng-repeat="i in range()">
-				Column {{i+1}}
-			</td>
+			<th ng-repeat="i in range()">
+				{{getHeader(i)}} 
+    			<label class="encrypt">
+    				<input type="checkbox" ng-model="metadata.columns[i].encrypt"> 
+    				encrypt
+    			</label>
+			</th>
 		</tr>	
 	</thead>
 	<tbody>
@@ -29,7 +34,7 @@
 
 <p>TODO:</p>
 <ul>
-	<li>allow to set columns to encrypt;</li>
+	<li>crypt in node mock server and decrypt in client side</li>
 	<li>allow content editing?</li>
 	<li>allow to set columns header?</li>
 </ul>

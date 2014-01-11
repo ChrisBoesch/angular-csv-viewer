@@ -36762,6 +36762,12 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
         return $http.get(
           API_BASE + '/file/' + encodeURIComponent(key) + '.csv'
         );
+      },
+      info: function(key) {
+        return res.get({key: key}).$promise;
+      },
+      updateInfo: function(info) {
+        return res.save({key: info.key}, info).$promise;
       }
     };
   })
@@ -36777,7 +36783,6 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
     };
     
     files.all().then(function(data) {
-      console.dir(data);
       $scope.loading = false;
       $scope.files = data;
     });
@@ -36809,49 +36814,91 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
     $scope.action = API_BASE + '/file';
   }).
 
-  controller('EditCtrl', function($scope, $routeParams, $window, files) {
+  controller('EditCtrl', function($scope, $routeParams, $window, $q, files) {
+    var updateMetadata, columnsCopy,  makeCopy;
+
     $scope.loading = true;
-    // Key of file
-    // TODO: key doesn't need to be name.
-    $scope.name = decodeURIComponent($routeParams.fileName) || 'unknown';
-
-    $scope.data = [];    // parsed data
-    $scope.rawData = ""; // raw data (in case parsing fails)
     
-    // CSV settings
-    // TODO: let user define them.
-    $scope.delimiter = ',';
-    $scope.headerIncluded = false;
-
-    // columns
-    // TODO: add support for headers
-    $scope.colCount = 0;
-    $scope.headers = [];
+    $scope.data = [];
+    $scope.rawData = "";
+    $scope.metadata = {
+      'name': '',
+      'key': decodeURIComponent($routeParams.key),
+      'delimiter': ',',
+      'hasHeaderRow': false,
+      'columns':[]
+    };
 
     $scope.range = function() {
-      return $window._.range($scope.colCount);
+      return $window._.range($scope.metadata.columns.length);
     };
 
     $scope.getValue = function(row, index) {
       return (row.length > index) ? row[index] : '';
     };
 
-    files.download($routeParams.fileName).then(function(resp) {
-      var result = $.parse(resp.data, {
-        'delimiter': $scope.delimiter,
-        'header': $scope.headerIncluded,
+    $scope.getHeader = function(colIndex) {
+      if ($scope.metadata.columns[colIndex].name) {
+        return $scope.metadata.columns[colIndex].name;
+      } else {
+        return 'columns ' + colIndex;
+      }
+    };
+
+    updateMetadata = $window._.debounce(function(){
+      if ($window._.isEqual($scope.metadata.columns, columnsCopy)) {
+        return;
+      }
+      console.log('updating metadata...');
+      files.updateInfo($scope.metadata).then(function(){
+        // TODO: alert user (or revert if failed)
       });
 
-      $scope.loading = false;
-      
-      $scope.data = result.results;
-      $scope.colCount = $window._.max(
-        result.results,
-        function(e) {
-          return e.length;
-        }
-      ).length;
+      makeCopy();
+    }, 2000);
 
+    makeCopy = function() {
+      columnsCopy = $window._.map(
+        $scope.metadata.columns,
+        $window._.clone,
+        $window._
+      );
+    };
+
+    $q.all([
+      files.download($scope.metadata.key),
+      files.info($scope.metadata.key)
+    ]).then(function(respList) {
+      var result;
+
+      // update raw cvs content and metadata
+      $scope.rawData = respList[0].data;
+      $window._.extend(
+        $scope.metadata,
+        $window._.pick(
+          respList[1], 'name', 'key', 'delimiter', 'hasHeaderRow', 'columns'
+        )
+      );
+
+      // parse csv
+      result = $window.jQuery.parse($scope.rawData, {
+        'delimiter': $scope.metadata.delimiter,
+        'header': false
+      });
+
+      // update parsed data
+      $scope.data = $scope.metadata.hasHeaderRow ? result.results.slice(1): result.results;
+
+      // TODO: decrypt data
+
+      // watch for update of metadata.
+      for (var i = 0; i < $scope.metadata.columns.length; i++) {
+        $scope.$watch('metadata.columns['+i+'].encrypt', updateMetadata);
+      }
+
+      makeCopy();
+
+      $scope.loading = false;
     });
   });
 ;angular.module('myApp', ['app.config', 'ngRoute', 'app.homePages', 'app.filePages'])
@@ -36868,8 +36915,8 @@ angular.module('angularSpinkit').run(['$templateCache', function($templateCache)
         templateUrl: TPL_PATH + '/upload.html'
       }).
 
-      when('/file/:fileName', {
+      when('/file/:key', {
         controller: 'EditCtrl',
         templateUrl: TPL_PATH + '/edit.html'
-      });;
+      });
   });

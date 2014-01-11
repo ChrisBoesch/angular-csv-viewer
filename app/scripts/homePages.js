@@ -9,7 +9,6 @@ angular.module('app.homePages', ['app.config', 'app.services', 'ngResource', 'ng
     };
     
     files.all().then(function(data) {
-      console.dir(data);
       $scope.loading = false;
       $scope.files = data;
     });

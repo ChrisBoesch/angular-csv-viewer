@@ -40,6 +40,7 @@
     "grunt-connect-proxy": "~0.1.7"
   },
   "dependencies": {
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "csv": "~0.3.6"
   }
 }

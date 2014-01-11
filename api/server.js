@@ -1,6 +1,8 @@
 var express = require('express'),
   app = express(),
-  _ = require('lodash');
+  _ = require('lodash'),
+  csv = require('csv');
+
 
 // Simulate slow network with a delay
 var DELAY = process.env.DELAY || 0;
@@ -9,7 +11,7 @@ var DELAY = process.env.DELAY || 0;
 DELAY = 1000;
 
 //
-var FILE_DB = {};
+var FILE_DB = [];
 
 app.use(express.bodyParser());
 
@@ -21,10 +23,8 @@ app.get('/', function(req, res) {
  * Send  50 most file descriptions of the current logged in user, sorted by
  * last modification date.
  *
- * Sends a json object. The `files` attribute should be an array. Each element
- * should have `name`, `lastMofified`, `key` attributes.
- *  
- * should return an empty list and an http error code.
+ * Sends a json array of file metadata (see /file POST for 
+ * the description of the metadata)
  *
  * Error:
  *   - 401, if the user is not logged in (not implemented in mockup).
@@ -47,8 +47,44 @@ app.get('/file', function(req, res) {
   }, DELAY);
 });
 
+/**
+ * Expect a multipart/form-data body with `newFile` containing
+ * the new csv file, and form holding the optional 
+ * `name`, `delimiter` and `hasHeaderRow` attributes.
+ *
+ * The file name will default to the newFile `filename` attribute if 
+ * `name` is missing.
+ *
+ * `hasHeaderRow` will default to true.
+ *
+ * `delimiter` will default to ','.
+ *
+ * The server should save the file content and metada:
+ *  - `name` (string).
+ *  - `key` (string).
+ *  - `lastMofified` (int). Time stamps recording the time of the last 
+ *    modification (creating, edit? or encryption of a column).
+ *  - `hasHeaderRow` (bool).
+ *  - `delimiter` (string).
+ *  - `columns` (array). Each element must have an `encrypt` attribute
+ *    and may have a name attribute.
+ *
+ * The server should check every row to count the number of columns, not just
+ * the first one.
+ * 
+ * Send a json response with a `name`, a `key` and a `lastUpdate` update
+ * attribute.
+ *
+ * Errors:
+ *   - 401, if the user is not logged in.
+ *   - 400, if the `newFile` is missing.
+ *   
+ */
 app.post('/file', function(req, res) {
-  var name;
+  var max = 0,
+    headers = [],
+    parser,
+    metadata;
 
   if (!req.files || !req.files.newFile) {
     // TODO
@@ -60,35 +96,100 @@ app.post('/file', function(req, res) {
     return res.redirect('back');
   }
 
-  if (req.body && req.body.fileName) {
-    name = req.body.fileName;
-  } else {
-    name = req.files.newFile.name;
+  metadata = req.body ? req.body : {};
+  _.defaults(metadata, {
+    'name': req.files.newFile.name,
+    'delimiter': ',',
+    'columns': [],
+    'hasHeaderRow': true
+  });
+
+  parser = csv().from(req.files.newFile.path, {'delimiter': metadata.delimiter});
+  parser.on('record', function(row) {
+    if (row.length > max) {
+      max = row.length;
+    }
+  });
+
+  if (metadata.hasHeaderRow) {
+    parser.on('record', function(row, index){
+      if (index === 0) {
+        headers = row;
+      }
+    });
   }
 
-  FILE_DB[name] = {
-    '_path': req.files.newFile.path,
-    'name': name,
-    'key': name,
-    'lastUpdate': new Date().getTime(),
-  };
-  res.redirect('/#/file/' + encodeURIComponent(name));
+  parser.on('end', function(){
+
+    for (var i = 0; i < max; i++) {
+      metadata.columns.push({'encrypt': false, 'name': headers[i]});
+    }
+
+    metadata.key = FILE_DB.length;
+    metadata.lastUpdate = new Date().getTime();
+    metadata._path = req.files.newFile.path;
+    FILE_DB.push(metadata);
+    
+    res.redirect('/#/file/' + metadata.key);
+  });
 });
 
-app.get('/file/:fileName.csv', function(req, res) {
-  if (!req.params.fileName) {
-    return res.send(404, 'Sorry, we cannot find that!');
-  }
-
-  var fileName = decodeURIComponent(req.params.fileName);
-  if (!FILE_DB[fileName] || !FILE_DB[fileName]._path) {
+/**
+ * Serve the file content
+ * 
+ * Errors:
+ *   - 401, if the user is not logged in.
+ *   - 403, if the user doesn't own the file.
+ *   - 404, if the file doesn't exist.
+ *   
+ */
+app.get('/file/:key(\\d+).csv', function(req, res) {
+  var key = decodeURIComponent(req.params.key);
+  if (!FILE_DB[key] || !FILE_DB[key]._path) {
     return res.send(404, 'Sorry, we cannot find that!');
   }
   setTimeout(function() {
     res.download(
-      FILE_DB[fileName]._path,
-      encodeURIComponent(fileName) + '.csv'
+      FILE_DB[key]._path,
+      encodeURIComponent(key) + '.csv'
     );
+  }, DELAY + 500);
+});
+
+/**
+ * Send the file metadata (name, key, lastMofified, 
+ * hasHeaderRow, delimiter, columns).
+ *
+ * Errors:
+ *   - 401, if the user is not logged in.
+ *   - 403, if the user doesn't own the file.
+ *   - 404, if the file doesn't exist.
+ */
+app.get('/file/:key(\\d+)', function(req, res) {
+  var key = decodeURIComponent(req.params.key);
+  if (!FILE_DB[key]) {
+    return res.send(404, 'Sorry, we cannot find that!');
+  }
+
+  setTimeout(function() {
+    res.send(FILE_DB[key]);
+  }, DELAY);
+});
+
+/**
+ * Update the file metadata and encrypt columns if necessary
+ * 
+ */
+app.post('/file/:key(\\d+)', function(req, res) {
+  var key = decodeURIComponent(req.params.key);
+  if (!FILE_DB[key]) {
+    return res.send(404, 'Sorry, we cannot find that!');
+  }
+
+  // todo encrypt
+  _.extend(FILE_DB[key], req.body);
+  setTimeout(function() {
+    res.send(FILE_DB[key]);
   }, DELAY);
 });
 
