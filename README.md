@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/ChrisBoesch/angular-csv-viewer.png?branch=master)](https://travis-ci.org/ChrisBoesch/angular-csv-viewer)
 # Angular CSV Viewer App
 
 An AngularJS-based user interface for an CSV viewer app
