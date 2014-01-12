@@ -12,7 +12,8 @@
     "bootstrap": "3.0.3",
     "angular-spinkit": "~0.0.2",
     "jquery.parse": "git://github.com/mholt/jquery.parse.git#2.0.0",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "jsencrypt": "~2.0.0"
   },
   "devDependencies": {
     "angular-mocks": "1.2.7"

@@ -11,6 +11,7 @@ module.exports = function(config) {
       'bower_components/bootstrap/dist/js/bootstrap.js',
       'bower_components/angular-spinkit/build/angular-spinkit.js',
       'bower_components/jquery.parse/jquery.parse.js',
+      'bower_components/jsencrypt/bin/jsencrypt.js',
       'app/scripts/config.js',
       'app/scripts/directives.js',
       'app/scripts/services.js',

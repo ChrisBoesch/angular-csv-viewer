@@ -4,7 +4,10 @@
     	<span ng-hide="loading">named "{{metadata.name}}"</span>
     </h1>
 </div>
-
+<div class="form-group">
+	<label for="pem">Private Key</label>
+	<textarea class="form-control" rows="15" id="pem" name="pem" ng-model="pem"></textarea>
+</div>
 <table class="table table-file-data">
 	<thead>
 		<tr>
@@ -34,7 +37,8 @@
 
 <p>TODO:</p>
 <ul>
-	<li>crypt in node mock server and decrypt in client side</li>
+	<li>Hide key form when the data are decrypted.</li>
+	<li>Report when the key is wrong.</li>
 	<li>allow content editing?</li>
 	<li>allow to set columns header?</li>
 </ul>

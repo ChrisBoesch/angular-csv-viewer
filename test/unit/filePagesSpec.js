@@ -111,6 +111,33 @@ describe('File Pages', function() {
         expect(scope.loading).toBe(false);
         expect(scope.metadata.columns.length).toEqual(3);
       }));
+
+      it('Should decrypt encrypted columns', inject(function($controller){
+        var lorem = 'A5IwaerPVzcIWOtCt3VBlkdIquXO8tnPuX1XtwuHGXyuAvA60K7VGgcvjunq2CbOz7bA78SDXokl\nYhLHWhCzua0aTWNCGGcmji6JRwTxbJVNtcDTqTv5C9iG2k7dkR0aa44URqZlYK/top/tHFvxI3on\nvCSin6hj8kAASfmgNyQ=\n';
+        ctrl = $controller('EditCtrl', {
+          '$scope': scope,
+          '$routeParams': {'fileName': 'foo'},
+          'files': files
+        });
+        
+        info.resolve({
+          name: 'foo',
+          key: 1234,
+          lastMofified: 1234567890,
+          hasHeaderRow: false,
+          delimiter: ',',
+          columns: [
+            {encrypt: false, name: undefined},
+            {encrypt: false, name: undefined},
+            {encrypt: true, name: undefined}
+          ]
+        });
+        download.resolve({'data': 'bob,foo,"'+lorem+'"\nalice,baz,"'+lorem+'"'});
+        scope.pem = '-----BEGIN RSA PRIVATE KEY-----\nMIICXgIBAAKBgQDJ56nKs/k7EXy5O1SJyuAVQnb43p2Rq41mdkoqHdMt8I0/IY9t\n/Rg6F2F7UofvvFzPnnFkHRv5zDZL2qUlUmZ5XxD0KdTbmSnCYUmFMb1U3/HosgP9\nVND845Oz8Dmhah0RAMaB3PSZMNkvnZoR3Q/05r3coyIoYay2MMZ3dZ/lzQIDAQAB\nAoGAWC5cwtItxPWTQpc+CdxYWBCqQ3F+4hNJ83kwVQqnpAXOusbejMwgW6bAhYr7\nIeJjqq3pmi74e/YLtL9up0lAxXTsv9ugjYvIZnenJXEzRuEdlXZASaE/HzFGDbVz\n6Szztb5B+hEYocO+QPPI+KhkWOqP+HryjSzM0+MBtSk3V+UCQQDpnuhu+nE7pSlZ\nNA6Pq/62qUV7o1pTjRqe46vzxUnpzI5YPULY1Ssuv0SpJ6GWpKKlgIQ8JAulIpfN\nULvcxTTDAkEA3T78vt2EeCvPVEn40RaM1OBdaoEoXKxxS4Ap8QJ9Zcdy0a4sJNeT\ndjOG2tmzTA3GVoSgojWpVKyr73rGkBySLwJBAKoNGXNuqO2ZkzdzRQYfVBDxtboB\ndcZLd40gfBG9Ecg1NYfVT8s1n3EvmHLofh6BSELgAWEle7SAMa8pjRVuFrECQQCt\n7tDANGHqH3b1KtpDdljtGh4WlsdmY+MFmhJe+LgghbYMhcMKi7fQGx4Pe0prpgCh\nD89A9rLScJUSxhDIRs3dAkEAkvqbGH6FjuvoQwkr1ghvdXcBvjWvRFsqG+Z9jSC8\n81um5sINaWXyObtT0jfcEhDs2mcSaRL6YpcVxaE5lNtbzQ==\n-----END RSA PRIVATE KEY-----';
+        scope.$apply();
+        
+        expect(scope.data).toEqual([['bob', 'foo', 'Lorem ipsum dolor sit amet'], ['alice', 'baz', 'Lorem ipsum dolor sit amet']]);
+      }));
     });
 
   });
