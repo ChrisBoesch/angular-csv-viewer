@@ -1,0 +1,41 @@
+<div class="page-header edu-top-header">
+    <h1>
+    	Edit file 
+    	<span ng-hide="loading">named "{{metadata.name}}"</span>
+    </h1>
+</div>
+
+<table class="table table-file-data">
+	<thead>
+		<tr>
+			<th ng-repeat="i in range()">
+				{{getHeader(i)}} 
+    			<label class="encrypt">
+    				<input type="checkbox" ng-model="metadata.columns[i].encrypt"> 
+    				encrypt
+    			</label>
+			</th>
+		</tr>	
+	</thead>
+	<tbody>
+		<tr ng-show="loading">
+			<td><wave-spinner></wave-spinner></td>
+		</tr>
+		<tr ng-show="!loading && data.length == 0">
+			<td>No data</td>
+		</tr>
+		<tr ng-repeat="row in data">
+			<td ng-repeat="i in range()">
+				{{getValue(row, i)}}
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>TODO:</p>
+<ul>
+	<li>crypt in node mock server and decrypt in client side</li>
+	<li>allow content editing?</li>
+	<li>allow to set columns header?</li>
+</ul>
+

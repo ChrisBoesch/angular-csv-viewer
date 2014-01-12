@@ -7557,3 +7557,8 @@ body {
 .animate-enter.animate-enter-active {
     opacity: 1;
 }
+
+th label {
+    margin-bottom: 0;
+}
+
