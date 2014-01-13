@@ -1,7 +1,7 @@
 angular.module('app.services', ['app.config']).
 
   factory('files', function(API_BASE, $resource, $http){
-    var res = $resource(API_BASE + '/file/:key');
+    var res = $resource(API_BASE + '/file/:key', {key:'@key'});
     return {
       all: function() {
         return res.query().$promise;

@@ -1,11 +1,26 @@
 angular.module('app.homePages', ['app.config', 'app.services', 'ngResource', 'ngAnimate', 'angularSpinkit']).
 
-  controller('HomeCtrl', function($scope, files) {
+  controller('HomeCtrl', function($scope, $window, files) {
     $scope.files = [];
     $scope.loading = true;
     
     $scope.urlFor = function(file) {
+      if (!file || $window._.isUndefined(file.key)) {
+        return;
+      }
+
       return '/#/file/' + encodeURIComponent(file.key);
+    };
+
+    $scope.delete = function(file) {
+      var index;
+      if ($window.confirm("Are you sure you want to delete " + file.name)) {
+        index = $scope.files.indexOf(file);
+        file.$delete().then(function(){
+          $scope.files.splice(index, index+1);
+        });
+      }
+
     };
     
     files.all().then(function(data) {

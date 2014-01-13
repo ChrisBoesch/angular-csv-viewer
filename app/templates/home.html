@@ -25,9 +25,10 @@
 			<td>{{file.name}}</td>
 			<td>{{file.lastUpdate|date: 'medium'}}</td>
 			<td>
-				<a ng-href="{{urlFor(file)}}">
-					edit
-				</a>
+				<div class="btn-group">
+					<a ng-href="{{urlFor(file)}}" type="button" class="btn btn-primary btn-sm">edit</a>
+					<button ng-click="delete(file)" type="button" class="btn btn-danger btn-sm">delete</button>
+				</div>
 			</td>
 		</tr>
 	</tbody>

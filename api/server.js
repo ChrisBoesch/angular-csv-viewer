@@ -68,6 +68,10 @@ app.get('/file', function(req, res) {
       return -f.lastModification;
     });
 
+    files = _.remove(files, function(e){
+      return e;
+    });
+
     if (files.length > 50) {
       files = files.slice(0, 50);
     }
@@ -239,6 +243,25 @@ app.post('/file/:key(\\d+)', function(req, res) {
   setTimeout(function() {
     res.send(FILE_DB[key]);
   }, DELAY);
+});
+
+/**
+ * Delete the file.
+ * 
+ */
+app.delete('/file/:key(\\d+)', function(req, res) {
+  var key = decodeURIComponent(req.params.key);
+
+  if (!FILE_DB[key]) {
+    return res.send(404, 'Sorry, we cannot find that!');
+  }
+
+  FILE_DB[key] = false;
+
+  setTimeout(function() {
+    res.send({});
+  }, DELAY);
+
 });
 
 app.listen(9090);

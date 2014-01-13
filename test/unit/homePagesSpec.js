@@ -2,7 +2,7 @@
 
 describe('Home Pages', function() {
 
-  var ctrl, scope, route;
+  var ctrl, scope, route, win={};
 
   beforeEach(module('app.homePages'));
 
@@ -20,7 +20,8 @@ describe('Home Pages', function() {
 
       ctrl = $controller('HomeCtrl', {
         $scope: scope,
-        files: files
+        files: files,
+        $window: win
       });
     }));
 
@@ -47,6 +48,43 @@ describe('Home Pages', function() {
         expect(scope.files).toEqual(data);
       });
 
+    });
+
+    describe('scope delete method ', function(){
+      beforeEach(function(){
+        win.confirm = function() {
+          return true;
+        };
+      });
+
+      it('should called the file resource $delete method', inject(function($q) {
+        var called=false, mockFile = {
+          $delete: function(){
+            var d = $q.defer();
+            called = true;
+            d.resolve({});
+            return d.promise;
+          }
+        };
+
+        scope.delete(mockFile);
+        expect(called).toBe(true);
+      }));
+
+      it('should remove the file for the files list', inject(function($q) {
+        var mockFile = {
+          $delete: function(){
+            var d = $q.defer();
+            d.resolve({});
+            return d.promise;
+          }
+        };
+        scope.files = [mockFile];
+        scope.delete(mockFile);
+
+        scope.$apply();
+        expect(scope.files).toEqual([]);
+      }));
     });
 
   });
