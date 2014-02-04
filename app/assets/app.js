@@ -41055,7 +41055,7 @@ var JSEncrypt = JSEncryptExports.JSEncrypt;
 ;angular.module('app.services', ['app.config']).
 
   factory('files', function(API_BASE, $resource, $http){
-    var res = $resource(API_BASE + '/file/:key');
+    var res = $resource(API_BASE + '/file/:key', {key:'@key'});
     return {
       all: function() {
         return res.query().$promise;
@@ -41076,12 +41076,27 @@ var JSEncrypt = JSEncryptExports.JSEncrypt;
 
 ;;angular.module('app.homePages', ['app.config', 'app.services', 'ngResource', 'ngAnimate', 'angularSpinkit']).
 
-  controller('HomeCtrl', function($scope, files) {
+  controller('HomeCtrl', function($scope, $window, files) {
     $scope.files = [];
     $scope.loading = true;
     
     $scope.urlFor = function(file) {
+      if (!file || $window._.isUndefined(file.key)) {
+        return;
+      }
+
       return '/#/file/' + encodeURIComponent(file.key);
+    };
+
+    $scope.delete = function(file) {
+      var index;
+      if ($window.confirm("Are you sure you want to delete " + file.name)) {
+        index = $scope.files.indexOf(file);
+        file.$delete().then(function(){
+          $scope.files.splice(index, index+1);
+        });
+      }
+
     };
     
     files.all().then(function(data) {
